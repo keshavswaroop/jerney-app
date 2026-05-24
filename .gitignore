@@ -1,0 +1,33 @@
+# Node
+node_modules/
+dist/
+.env
+*.log
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/crash.log
+terraform/.terraform.lock.hcl
+
+# Terraform variable secrets
+terraform/*.tfvars
+!terraform/example.tfvars
+
+# Kubernetes
+*.kubeconfig
+
+# Docker
+*.tar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Notes
+notes.txt

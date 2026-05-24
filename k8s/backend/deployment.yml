@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+  namespace: jerney
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: jerney-backend
+          image: swaroops2803/jerney-microservice-application-backend:v1
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5000
+
+          env:
+            - name: DB_HOST
+              # value: jerney-db
+              value: db-service
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_DB
+
+#Note: Mainly, there are 3 places where the label and selectors must be same: 1. we define the name of the label in the metadata section
+# 2. deployment selector, in the 1st spec section
+# 3. in the pod spec section, inside the template.spec section
+# 4. Next in the service,yaml file. it tells  to route the traffic these pods

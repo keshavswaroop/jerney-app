@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jerney-backend
+  namespace: jerney
+
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+
+# Note: DB host name (backend deployment) and service (db service) name must be same so that the backend can talk with the frontend
+#Note: do check the nginx.conf for the names used by the developes in the api request. Makesure it is the same name used as the name of the service.
+
+# containerPort == targetPort ✅
+# port = how you expose service
+
+# port → how service is exposed
+# targetPort → where app is actually running
+
+# Backend App (inside container)
+#         ↓
+# containerPort: 5000
+#         ↓
+# targetPort: 5000
+#         ↓
+# Service port: 5000
+#         ↓
+# Other pods / ingress / client

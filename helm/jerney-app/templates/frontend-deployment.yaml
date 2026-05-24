@@ -1,0 +1,32 @@
+{{- with .Values.frontend}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .deploymentName }}
+  labels:
+    app: {{ .labels.app }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ .labels.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .labels.app }}
+    spec:
+      serviceAccountName: {{ $.Values.serviceAccount.name | default "default" }}
+      containers:
+        - name: frontend-deployment
+          image: "{{ $.Values.repository }}/{{ .image.name }}:{{ .image.tag }}"
+          resources:    #Temporary adjusted
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: {{ .containerPort }}
+{{- end}}

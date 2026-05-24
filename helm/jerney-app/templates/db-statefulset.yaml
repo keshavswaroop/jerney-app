@@ -1,0 +1,58 @@
+{{- with .Values.db}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .deploymentName }}
+  labels:
+    app: {{ .labels.app }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .labels.app }}
+  serviceName: {{ .serviceName }}
+  replicas: {{ .replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .labels.app }}
+    spec:
+      containers:
+        - name: jerney-db
+          image: {{ .image }}
+          ports:
+            - containerPort: {{ .containerPort }}
+              name: web
+          volumeMounts:
+            - name: {{ .volumeClaimTemplate.name }}
+              mountPath: {{ .volumeMounts.mountPath }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_DB
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .volumeClaimTemplate.name }}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: gp2
+        resources:
+          requests:
+            storage: 1Gi
+
+{{- end}}
+
+
+# DB doesnot require the service account as it doesnt call kuberntes API

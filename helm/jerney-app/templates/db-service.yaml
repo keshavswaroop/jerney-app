@@ -1,0 +1,14 @@
+{{- with .Values.db}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .serviceName }}
+  namespace: {{ $.Values.namespace }}
+
+spec:
+  selector:
+    app: {{ .labels.app }}
+  ports:
+    - port: {{ .port }}
+      targetPort: {{ .containerPort }}
+{{- end }}

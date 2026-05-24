@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-statefulset
+  labels:
+    app: db
+  namespace: jerney
+spec:
+  selector:
+    matchLabels:
+      app: db
+  serviceName: db-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: jerney-db
+          image: postgres:18-bookworm
+          ports:
+            - containerPort: 5432
+              name: web
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_DB
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

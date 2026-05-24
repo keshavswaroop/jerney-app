@@ -1,0 +1,56 @@
+namespace: jerney
+repository: swaroops2803
+
+backend:
+  name: jerney-backend
+  deploymentName: backend-deployment
+  serviceName: jerney-backend
+  replicas: 1
+  labels:
+    app: backend
+  image:
+    name: jerney-microservice-application-backend
+    tag: v1
+    containerPort: 5000
+    port: 5000
+    env:
+      host: db-service
+      port: 5432
+frontend:
+  deploymentName: frontend-deployment
+  serviceName: frontend-service
+  labels:
+    app: frontend
+  replicas: 1
+  image:
+    name: jerney-microservice-application-frontend
+    tag: v1
+  containerPort: 80
+  port: 80
+db:
+  name: jerney-db
+  deploymentName: db-statefulset
+  serviceName: db-service
+  labels:
+    app: db
+  replicas: 1
+  image: postgres:18-bookworm
+  containerPort: 5432
+  volumeMounts:
+    # name: postgres-storage
+    mountPath: /var/lib/postgresql
+  volumeClaimTemplate:
+    name: postgres-storage
+  port: 5432
+
+ingress:
+  name: jerney-ingress
+  labels:
+    app: myingress
+  host: jerney.local
+  path: /
+  annotations: {}
+
+serviceAccount:
+  create: false
+  name: ""

@@ -1,0 +1,54 @@
+{{- with .Values.backend}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .deploymentName }}
+  labels:
+    app: {{ .labels.app }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ .labels.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .labels.app }}
+    spec:
+      serviceAccountName: {{ $.Values.serviceAccount.name | default "default" }}
+      containers:
+        - name: jerney-backend
+          image: "{{ $.Values.repository }}/{{ .image.name }}:{{ .image.tag }}"
+          resources:    #Temporary adjusted
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: {{ .image.containerPort }}
+
+          env:
+            - name: DB_HOST
+              # value: jerney-db
+              value: {{ .image.env.host }}
+            - name: DB_PORT
+              value: {{ $.Values.db.containerPort | quote }}
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_DB
+{{- end}}
