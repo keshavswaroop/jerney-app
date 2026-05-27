@@ -75,6 +75,10 @@ module "eks" {
   # Optional: Adds the current caller identity as an administrator via cluster access entry
   enable_cluster_creator_admin_permissions = true
 
+  #oidc
+#   terraform automatically creates OIDC provider
+  enable_irsa = true
+
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
@@ -104,3 +108,11 @@ module "eks" {
     Terraform   = "true"
   }
 }
+
+
+# We want terraform to manage -
+# OIDC Provider 
+# IAM role 
+# TAM policy attachment 
+# vpc 
+# eks 
