@@ -1,9 +1,22 @@
 name: Terraform automation pipeline
 
-on: workflow_dispatch
+on:
+    push:
+        branches:
+            - master
+
+    pull_request:
+        branches:
+            - master
+
+    workflow_dispatch:
 
 jobs:
-    terraform:
+    terraform-plan:
+        defaults:
+            run:
+                working-directory: terraform
+
         runs-on: ubuntu-latest
         steps:
             - name: Clone github repo
@@ -20,16 +33,41 @@ jobs:
                   terraform_version: 1.12.2
             - name: Terraform init
               run: terraform init
-              working-directory: ./terraform
+
             - name: Terraform validate
               run: terraform validate
-              working-directory: ./terraform
+
             - name: Terraform format
               run: terraform fmt -check
-              working-directory: ./terraform
+
             - name: Terraform plan
               run: terraform plan
-              working-directory: ./terraform
-            # - name: Terraform apply
-            #   run: terraform apply --auto-approve
-            #   working-directory: ./terraform
+
+    terraform-apply:
+        if: github.ref == 'refs/head/master'
+        needs: terraform-plan
+
+        environment:
+            name: production
+
+        defaults:
+            run:
+                working-directory: terraform
+        runs-on: ubuntu-latest
+        steps:
+            - name: Clone repo
+              uses: actions/checkout@v4
+            - name: aws configure
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ap-south-1
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: 1.12.2
+            - name: Initialize terraform
+              run: terrafom init
+            - name: Terraform Apply
+              run: terraform apply --auto-apply
