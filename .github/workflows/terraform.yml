@@ -44,7 +44,7 @@ jobs:
               run: terraform plan
 
     terraform-apply:
-        if: github.ref == 'refs/head/master'
+        if: github.ref == 'refs/heads/master'
         needs: terraform-plan
 
         environment:
@@ -68,6 +68,6 @@ jobs:
               with:
                   terraform_version: 1.12.2
             - name: Initialize terraform
-              run: terrafom init
+              run: terraform init
             - name: Terraform Apply
-              run: terraform apply --auto-apply
+              run: terraform apply -auto-apply
