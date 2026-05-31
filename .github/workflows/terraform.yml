@@ -1,0 +1,35 @@
+name: Terraform automation pipeline
+
+on: workflow_dispatch
+
+jobs:
+    terraform:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Clone github repo
+              uses: actions/checkout@v4
+            - name: Configure AWS
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ap-south-1
+            - name: Setup terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: 1.12.2
+            - name: Terraform init
+              run: terraform init
+              working-directory: ./terraform
+            - name: Terraform validate
+              run: terraform validate
+              working-directory: ./terraform
+            - name: Terraform format
+              run: terraform fmt -check
+              working-directory: ./terraform
+            - name: Terraform plan
+              run: terraform plan
+              working-directory: ./terraform
+            # - name: Terraform apply
+            #   run: terraform apply --auto-approve
+            #   working-directory: ./terraform
