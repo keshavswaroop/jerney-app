@@ -6,7 +6,7 @@
 # ├── Route Tables
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
   version = "~> 5.0"
 
   name = var.vpc_name
@@ -48,26 +48,26 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.0"
 
-  cluster_name = var.eks_cluster_name
+  cluster_name    = var.eks_cluster_name
   cluster_version = "1.32"
 
   cluster_endpoint_public_access = true
 
   cluster_addons = {
     coredns = {
-        most_recent = true
+      most_recent = true
     }
 
     kube-proxy = {
-        most_recent = true
+      most_recent = true
     }
 
     vpc-cni = {
-        most_recent = true
+      most_recent = true
     }
 
     aws-ebs-csi-driver = {
-        most_recent = true
+      most_recent = true
     }
   }
 
@@ -76,7 +76,7 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
 
   #oidc
-#   terraform automatically creates OIDC provider
+  #   terraform automatically creates OIDC provider
   enable_irsa = true
 
   vpc_id     = module.vpc.vpc_id
