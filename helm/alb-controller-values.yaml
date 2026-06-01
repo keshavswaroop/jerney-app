@@ -1,0 +1,12 @@
+clusterName: jerney-eks-cluster
+
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller
+
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::910929920228:role/alb-controller-role
+
+region: ap-south-1
+
+vpcId: vpc-0732967ca3870981f
