@@ -9,4 +9,4 @@ serviceAccount:
 
 region: ap-south-1
 
-vpcId: vpc-0732967ca3870981f
+# vpcId: vpc-08c63433e07d759b3
